@@ -1,0 +1,13 @@
+GET http://localhost:3000/orders
+
+###
+GET http://localhost:3000/orders/1
+
+###
+POST http://localhost:3000/orders
+
+###
+PATCH http://localhost:3000/orders/1
+
+###
+DELETE http://localhost:3000/orders/1
