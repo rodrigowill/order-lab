@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
+import { OrderStatus } from '../generated/prisma/enums.js';
 
 @Injectable()
 export class OrdersService {
@@ -9,11 +10,15 @@ export class OrdersService {
   constructor(private prismaService: PrismaService){}
 
   create(createOrderDto: CreateOrderDto) {
-    return 'This action adds a new order';
+    return this.prismaService.order.create({
+      data: {
+        ...createOrderDto, status: OrderStatus.INCLUDED,
+      }
+    })
   }
 
   findAll() {
-    return `This action returns all orders`;
+    return this.prismaService.order.findMany();
   }
 
   findOne(id: number) {

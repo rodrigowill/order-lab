@@ -5,6 +5,13 @@ GET http://localhost:3000/orders/1
 
 ###
 POST http://localhost:3000/orders
+Content-Type: application/json
+
+{
+    "name": "Tamaris Soares",
+    "description": "Quarteirão com Queijo",
+    "value": 51
+}
 
 ###
 PATCH http://localhost:3000/orders/1
