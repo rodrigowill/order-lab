@@ -2,6 +2,8 @@
 
 API de pedidos em [NestJS](https://nestjs.com/) com [Prisma](https://www.prisma.io/) e PostgreSQL. O objetivo é estudar o fluxo de uma API REST: módulos, Prisma Client e banco local.
 
+A spec funcional está em [docs/features/pedidos.md](docs/features/pedidos.md). O desenho técnico do laboratório está em [docs/dd-pedidos-de-balcao-20261015-095517.md](docs/dd-pedidos-de-balcao-20261015-095517.md).
+
 ## Requisitos
 
 - Node.js 22
