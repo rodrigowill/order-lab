@@ -8,11 +8,6 @@ API de pedidos em [NestJS](https://nestjs.com/) com [Prisma](https://www.prisma.
 - npm
 - Docker, para subir o Postgres
 
-O Nest deste projeto não sobe no Node 20. Confira com `node -v`. Se usar nvm, o padrão da máquina pode ser outro:
-
-```bash
-nvm alias default 22
-```
 
 ## Subir o projeto
 
