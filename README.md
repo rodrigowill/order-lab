@@ -59,4 +59,4 @@ DATABASE_URL="postgresql://postgres:postgres@localhost:5432/order"
 
 O modelo `Order` está em `prisma/schema.prisma`, com status `INCLUDED`, `RECEIVED`, `PREPARED` e `DELIVERED`. Os métodos de `OrdersService` ainda devolvem o texto gerado pelo scaffold do Nest; a persistência no banco é o próximo passo.
 
-Exemplos de chamada estão em `api.http`.
+Exemplos de chamada estão em `api.http` (que também pode ser usado como executor das chamadas Rest por meio da extensão Rest Client).
