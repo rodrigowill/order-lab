@@ -1,7 +1,7 @@
 GET http://localhost:3000/orders
 
 ###
-GET http://localhost:3000/orders/1
+GET http://localhost:3000/orders/b3798338-bcbd-4712-aaae-cb554497baf4
 
 ###
 POST http://localhost:3000/orders
@@ -14,7 +14,14 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3000/orders/1
+PATCH http://localhost:3000/orders/b0493d33-9d5a-4560-8710-3aa3649dd1cb
+Content-Type: application/json
+
+{
+    "name": "Tamaris Amaral Soares",
+    "description": "Quarteirão com Queijo",
+    "value": 45.90
+}
 
 ###
-DELETE http://localhost:3000/orders/1
+DELETE http://localhost:3000/orders/eabade6a-5e11-4f78-a485-51cec80aa1a2

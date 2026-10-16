@@ -21,15 +21,22 @@ export class OrdersService {
     return this.prismaService.order.findMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  findOne(id: string) {
+    return this.prismaService.order.findUnique({
+      where: { id },
+    });
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
+  update(id: string, updateOrderDto: UpdateOrderDto) {
+    return this.prismaService.order.update({
+      where: {id},
+      data: updateOrderDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  remove(id: string) {
+    return this.prismaService.order.delete({
+      where: {id}
+    });
   }
 }
