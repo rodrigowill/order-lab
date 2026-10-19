@@ -3,6 +3,9 @@ import { CreateOrderDto } from './dto/create-order.dto.js';
 import { UpdateOrderDto } from './dto/update-order.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { OrderStatus } from '../generated/prisma/enums.js';
+import { NotFoundError } from '../errors.js';
+import { Prisma } from '../generated/prisma/client.js';
+
 
 @Injectable()
 export class OrdersService {
@@ -21,22 +24,43 @@ export class OrdersService {
     return this.prismaService.order.findMany();
   }
 
-  findOne(id: string) {
-    return this.prismaService.order.findUnique({
+  async findOne(id: string) {
+    try {
+      return await this.prismaService.order.findUniqueOrThrow({
       where: { id },
     });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025'){
+        throw new NotFoundError(`Pedido com ID ${id} não encontrado`);
+      }
+      throw error;
+    }
   }
 
-  update(id: string, updateOrderDto: UpdateOrderDto) {
-    return this.prismaService.order.update({
-      where: {id},
-      data: updateOrderDto,
-    });
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
+    try {
+      return await this.prismaService.order.update({
+        where: {id},
+        data: updateOrderDto,
+      });
+        } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025'){
+        throw new NotFoundError(`Pedido com ID ${id} não encontrado`);
+      }
+      throw error;
+    }
   }
 
-  remove(id: string) {
-    return this.prismaService.order.delete({
-      where: {id}
-    });
+  async remove(id: string) {
+    try {
+      return await this.prismaService.order.delete({
+        where: {id}
+      });
+        } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025'){
+        throw new NotFoundError(`Pedido com ID ${id} não encontrado`);
+      }
+      throw error;
+    }
   }
 }

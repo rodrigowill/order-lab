@@ -1,27 +1,26 @@
 GET http://localhost:3000/orders
 
 ###
-GET http://localhost:3000/orders/b3798338-bcbd-4712-aaae-cb554497baf4
+GET http://localhost:3000/orders/1234
 
 ###
 POST http://localhost:3000/orders
 Content-Type: application/json
 
 {
-    "name": "Tamaris Soares",
-    "description": "Quarteirão com Queijo",
-    "value": 51
+    "name": "Nathan Henrique",
+    "description": "MC Lanche Feliz",
+    "value": 0
 }
 
 ###
-PATCH http://localhost:3000/orders/b0493d33-9d5a-4560-8710-3aa3649dd1cb
+PATCH http://localhost:3000/orders/34
 Content-Type: application/json
 
 {
-    "name": "Tamaris Amaral Soares",
-    "description": "Quarteirão com Queijo",
-    "value": 45.90
+    "name": "Helena Amaral Soares",
+    "value": 48.90
 }
 
 ###
-DELETE http://localhost:3000/orders/eabade6a-5e11-4f78-a485-51cec80aa1a2
+DELETE http://localhost:3000/orders/1s
