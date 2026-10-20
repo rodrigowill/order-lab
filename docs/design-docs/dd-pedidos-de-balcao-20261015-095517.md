@@ -157,19 +157,20 @@ O padrão de acesso é de uma pessoa: poucas escritas e leitura da lista depois 
 |---|---|---|---|---|---|
 | 1 | API NestJS com o módulo HTTP de pedidos | P | Concluída | Rodrigo | Nenhuma |
 | 2 | Postgres no Docker e modelo Prisma do pedido, com os quatro status | P | Concluída | Rodrigo | Fase 1 |
-| 3 | Gravar e listar o pedido colocado | P | Planejada | Rodrigo | Fase 2 |
-| 4 | Máquina de estados e comandos HTTP que publicam | M | Planejada | Rodrigo | Fase 3 |
-| 5 | Worker aplica aceitar, preparar e entregar | M | Planejada | Rodrigo | RabbitMQ e fase 4 |
-| 6 | Tela para anotar, listar e disparar os comandos | M | Planejada | Rodrigo | Fase 4 |
-| 7 | Compose com Postgres, RabbitMQ, API, worker e web | M | Planejada | Rodrigo | Fases 5 e 6 |
-| 8 | Trace no SigNoz do comando até o worker | M | Planejada | Rodrigo | Fase 7 |
+| 3 | Gravar e listar o pedido colocado | P | Concluída | Rodrigo | Fase 2 |
+| 4 | Domínio do pedido em TypeScript puro — entidade, máquina de estados e casos de uso com repositório em memória; testes de unidade sem Nest, Prisma ou fila | M | Planejada | Rodrigo | Fase 3 |
+| 5 | RabbitMQ no Compose e comandos HTTP que publicam (`accept`, `prepare`, `deliver`) — API usa o domínio da fase 4 | M | Planejada | Rodrigo | Fase 4 |
+| 6 | Worker consome a fila e aplica o próximo estado via domínio | M | Planejada | Rodrigo | Fase 5 |
+| 7 | Tela React para anotar, listar e disparar os comandos | M | Planejada | Rodrigo | Fase 5 |
+| 8 | Compose completo: Postgres, RabbitMQ, API, worker e web | M | Planejada | Rodrigo | Fases 6 e 7 |
+| 9 | Trace no SigNoz do comando HTTP até o worker | M | Planejada | Rodrigo | Fase 8 |
 
 ---
 
 ## Próximos Passos
 
-- Gravar e listar o pedido colocado — Rodrigo, fase 3
-- Isolar a máquina de estados em testes de unidade e publicar os comandos HTTP — Rodrigo, fase 4
+- Criar `src/domain/` com a entidade, a máquina de estados, os casos de uso e o repositório em memória; cobrir com testes de unidade sem Nest, Prisma ou fila — Rodrigo, fase 4
+- Adicionar RabbitMQ ao Compose e implementar os comandos HTTP `accept`, `prepare` e `deliver` usando o domínio da fase 4 — Rodrigo, fase 5
 - Fechar, na spec, tamanho máximo, texto de erro e se cancelar ou editar entra no laboratório — Rodrigo
 
 ---
