@@ -7,6 +7,7 @@ import { OrderRepository } from '../domain/order.repository.js';
 import { OrderEventPublisher } from '../domain/order-event-publisher.js';
 import { CreateOrderUseCase } from '../domain/create-order.usecase.js';
 import { AdvanceOrderStepUseCase } from '../domain/advance-order-step.usecase.js';
+import { ValidateOrderCommandUseCase } from '../domain/validate-order-command.usecase.js';
 
 @Module({
   imports: [PrismaModule],
@@ -16,8 +17,21 @@ import { AdvanceOrderStepUseCase } from '../domain/advance-order-step.usecase.js
     RabbitOrderEventPublisher,
     { provide: OrderRepository, useExisting: PrismaOrderRepository },
     { provide: OrderEventPublisher, useExisting: RabbitOrderEventPublisher },
-    CreateOrderUseCase,
-    AdvanceOrderStepUseCase,
+    {
+      provide: CreateOrderUseCase,
+      useFactory: (repo: OrderRepository) => new CreateOrderUseCase(repo),
+      inject: [OrderRepository],
+    },
+    {
+      provide: AdvanceOrderStepUseCase,
+      useFactory: (repo: OrderRepository) => new AdvanceOrderStepUseCase(repo),
+      inject: [OrderRepository],
+    },
+    {
+      provide: ValidateOrderCommandUseCase,
+      useFactory: (repo: OrderRepository) => new ValidateOrderCommandUseCase(repo),
+      inject: [OrderRepository],
+    }
   ],
 })
 export class OrdersModule {}

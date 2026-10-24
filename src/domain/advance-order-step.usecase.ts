@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Order } from "./order.entity.js";
 import { OrderRepository } from "./order.repository.js";
+import { NotFoundError } from "../errors.js";
 
 @Injectable()
 export class AdvanceOrderStepUseCase {
@@ -9,7 +10,7 @@ export class AdvanceOrderStepUseCase {
     async execute(id: string):Promise<Order> {
         const order = await this.repository.findById(id);
         if(!order){
-            throw new Error(`Pedido ${id} não encontrado.`);
+            throw new NotFoundError(`Pedido ${id} não encontrado.`);
         }
         const advanced = order.advance();
         await this.repository.save(advanced);
