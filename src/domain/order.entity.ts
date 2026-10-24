@@ -1,4 +1,4 @@
-import { NEXT_STATUS, OrderStatus } from "./order-status";
+import { NEXT_STATUS, OrderStatus } from "./order-status.js";
 
 
 export class Order {

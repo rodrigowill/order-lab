@@ -1,26 +1,23 @@
 GET http://localhost:3000/orders
 
 ###
-GET http://localhost:3000/orders/1234
+GET http://localhost:3000/orders/2
 
 ###
 POST http://localhost:3000/orders
 Content-Type: application/json
 
 {
-    "name": "Nathan Henrique",
+    "name": "Davi Henrique",
     "description": "MC Lanche Feliz",
-    "value": 0
+    "value": 30
 }
 
 ###
-PATCH http://localhost:3000/orders/34
-Content-Type: application/json
-
-{
-    "name": "Helena Amaral Soares",
-    "value": 48.90
-}
+POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/accept
 
 ###
-DELETE http://localhost:3000/orders/1s
+POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/prepare
+
+###
+POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/deliver

@@ -1,7 +1,7 @@
 import { Order } from './order.entity.js';
 
-export interface OrderRepository {
-  save(order: Order): Promise<void>;
-  findById(id: string): Promise<Order | null>;
-  findAll(): Promise<Order[]>;
+export abstract class OrderRepository {
+  abstract save(order: Order): Promise<void>;
+  abstract findById(id: string): Promise<Order | null>;
+  abstract findAll(): Promise<Order[]>;
 }

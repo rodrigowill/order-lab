@@ -1,35 +1,63 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode } from '@nestjs/common';
-import { OrdersService } from './orders.service.js';
+import { Controller, Get, Post, Body, Param, HttpCode } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto.js';
-import { UpdateOrderDto } from './dto/update-order.dto.js';
+import { CreateOrderUseCase } from '../domain/create-order.usecase.js';
+import { OrderEventPublisher } from '../domain/order-event-publisher.js';
+import { OrderRepository } from '../domain/order.repository.js';
+import { randomUUID } from 'crypto';
+import { ValidateOrderCommandUseCase } from '../domain/validate-order-command.usecase.js';
+import { OrderStatus } from '../domain/order-status.js';
 
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly createOrder: CreateOrderUseCase,
+    private readonly validateOrderCommandUseCase: ValidateOrderCommandUseCase,
+    private readonly publisher: OrderEventPublisher,
+    private readonly repository: OrderRepository,
+  ) {}
 
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+    return this.createOrder.execute({
+      id: randomUUID(),
+      name: createOrderDto.name,
+      description: createOrderDto.description,
+      value: Number(createOrderDto.value),
+    });
   }
 
   @Get()
   findAll() {
-    return this.ordersService.findAll();
+    return this.repository.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(id);
+    return this.repository.findById(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(id, updateOrderDto);
+  @Post(':id/accept')
+  @HttpCode(202)
+  async accept(@Param('id') id: string) {
+    await this.validateOrderCommandUseCase.execute(id, OrderStatus.INCLUDED);
+    await this.publisher.publishCommandAccept(id);
+    return { message: 'Comando de aceite publicado.' };
   }
 
-  @HttpCode(204)
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(id);
+  @Post(':id/prepare')
+  @HttpCode(202)
+  async prepare(@Param('id') id: string) {
+    await this.validateOrderCommandUseCase.execute(id, OrderStatus.RECEIVED);
+    await this.publisher.publishCommandPrepare(id);
+    return { message: 'Comando de preparo publicado'};
   }
+
+  @Post(':id/deliver')
+  @HttpCode(202)
+  async deliver(@Param('id') id: string) {
+    await this.validateOrderCommandUseCase.execute(id, OrderStatus.PREPARED);
+    await this.publisher.publishCommandDeliver(id);
+    return { message: 'Comando de entrega publicado'};
+  }
+
 }
