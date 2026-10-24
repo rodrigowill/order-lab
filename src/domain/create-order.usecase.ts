@@ -1,6 +1,7 @@
-import { OrderStatus } from "./order-status";
-import { Order } from "./order.entity";
-import { OrderRepository } from "./order.repository";
+import { Injectable } from "@nestjs/common";
+import { OrderStatus } from "./order-status.js";
+import { Order } from "./order.entity.js";
+import { OrderRepository } from "./order.repository.js";
 
 
 export interface CreateOrderInput {
@@ -9,7 +10,7 @@ export interface CreateOrderInput {
     description: string;
     value: number;
 }
-
+@Injectable()
 export class CreateOrderUseCase {
     constructor(private readonly repository: OrderRepository){}
 

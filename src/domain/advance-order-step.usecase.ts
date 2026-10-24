@@ -1,7 +1,8 @@
-import { Order } from "./order.entity";
-import { OrderRepository } from "./order.repository";
+import { Injectable } from "@nestjs/common";
+import { Order } from "./order.entity.js";
+import { OrderRepository } from "./order.repository.js";
 
-
+@Injectable()
 export class AdvanceOrderStepUseCase {
     constructor(private readonly repository: OrderRepository){}
 
