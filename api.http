@@ -8,16 +8,16 @@ POST http://localhost:3000/orders
 Content-Type: application/json
 
 {
-    "name": "Davi Henrique",
-    "description": "MC Lanche Feliz",
-    "value": 30
+    "name": "Matews Pereira",
+    "description": "Big Mac",
+    "value": 54.9
 }
 
 ###
-POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/accept
+POST http://localhost:3000/orders/01a0f821-af09-4b65-ab74-dc6600bd1ae7/accept
 
 ###
-POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/prepare
+POST http://localhost:3000/orders/b3798338-bcbd-4712-aaae-cb554497baf4/prepare
 
 ###
-POST http://localhost:3000/orders/09878a41-4905-426f-9e93-64f68ea7d1b5/deliver
+POST http://localhost:3000/orders/1/deliver
