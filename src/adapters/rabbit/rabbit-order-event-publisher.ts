@@ -27,14 +27,14 @@ export class RabbitOrderEventPublisher implements OrderEventPublisher, OnModuleI
         const carrier: Record<string, string> = {};
         propagation.inject(context.active(), carrier);
 
-        this.channel.sendToQueue('order.prepare', Buffer.from(JSON.stringify({ orderId })));
+        this.channel.sendToQueue('order.prepare', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
     }
 
     async publishCommandDeliver(orderId: string): Promise<void> {
         const carrier: Record<string, string> = {};
         propagation.inject(context.active(), carrier);
         
-        this.channel.sendToQueue('order.deliver', Buffer.from(JSON.stringify({ orderId })));
+        this.channel.sendToQueue('order.deliver', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
     }
 
 }

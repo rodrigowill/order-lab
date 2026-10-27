@@ -91,7 +91,7 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
       RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
-      OTEL_SERVICE_NAME: order-lab-api
+      OTEL_SERVICE_NAME: order-lab-worker
       OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     command: node dist/worker/worker.main.js
     depends_on: 
