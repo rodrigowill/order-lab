@@ -15,6 +15,6 @@ export class CreateOrderDto {
     @IsPositive()
     @IsNumber()
     @IsNotEmpty()
-    value: Decimal;
+    value: number;
 }
 
