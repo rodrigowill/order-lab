@@ -1,4 +1,4 @@
-name: Order App
+name: order-app
 services:
   postgres:
     image: postgres:17-alpine
@@ -15,6 +15,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["npx", "prisma", "migrate", "deploy", "--config", "prisma7.config.ts"]
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -24,8 +38,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: orderlab
+      RABBITMQ_DEFAULT_PASS: orderlab
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 10s
@@ -42,12 +56,14 @@ services:
       - "3000:3000"
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
       PORT: 3000
     command: node dist/main.js
     depends_on:
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
 
@@ -59,15 +75,15 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+      RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
     command: node dist/worker/worker.main.js
     depends_on: 
       postgres:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
-      api:
-        condition: service_started
 
   web:
     build:
@@ -79,3 +95,5 @@ services:
     restart: always
     ports:
       - "80:80"
+volumes:
+  postgres_data:
