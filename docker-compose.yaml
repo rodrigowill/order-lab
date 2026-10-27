@@ -46,13 +46,15 @@ services:
       timeout: 5s
       retries: 5
 
-  signoz:
-    image: signoz/signoz:latest
-    container_name: signoz
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
     ports:
-      - "3301:3301"
+      - "16686:16686"
       - "4317:4317"
       - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
     restart: always
 
   api:
@@ -68,7 +70,7 @@ services:
       RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
       PORT: 3000
       OTEL_SERVICE_NAME: order-lab-api
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4318/v1/traces
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     command: node dist/main.js
     depends_on:
       postgres:
@@ -77,7 +79,7 @@ services:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
-      signoz:
+      jaeger:
         condition: service_started
 
   worker:
@@ -90,7 +92,7 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
       RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
       OTEL_SERVICE_NAME: order-lab-api
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4318/v1/traces
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318/v1/traces
     command: node dist/worker/worker.main.js
     depends_on: 
       postgres:
@@ -99,7 +101,7 @@ services:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
-      signoz:
+      jaeger:
         condition: service_started
 
   web:
