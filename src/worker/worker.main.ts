@@ -1,3 +1,4 @@
+import './instrumentation.js';
 import 'dotenv/config';
 import { NestFactory } from "@nestjs/core";
 import { WorkerModule } from "./worker.module.js";

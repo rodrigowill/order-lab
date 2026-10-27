@@ -46,6 +46,15 @@ services:
       timeout: 5s
       retries: 5
 
+  signoz:
+    image: signoz/signoz:latest
+    container_name: signoz
+    ports:
+      - "3301:3301"
+      - "4317:4317"
+      - "4318:4318"
+    restart: always
+
   api:
     build:
       context: .
@@ -58,6 +67,8 @@ services:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
       RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
       PORT: 3000
+      OTEL_SERVICE_NAME: order-lab-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4318/v1/traces
     command: node dist/main.js
     depends_on:
       postgres:
@@ -66,6 +77,8 @@ services:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
+      signoz:
+        condition: service_started
 
   worker:
     build:
@@ -76,6 +89,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/order
       RABBITMQ_URL: amqp://orderlab:orderlab@rabbitmq:5672
+      OTEL_SERVICE_NAME: order-lab-api
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz:4318/v1/traces
     command: node dist/worker/worker.main.js
     depends_on: 
       postgres:
@@ -84,6 +99,8 @@ services:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
+      signoz:
+        condition: service_started
 
   web:
     build:
@@ -95,5 +112,6 @@ services:
     restart: always
     ports:
       - "80:80"
+
 volumes:
   postgres_data:

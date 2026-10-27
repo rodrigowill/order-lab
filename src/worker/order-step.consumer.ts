@@ -1,6 +1,7 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { connect, ChannelModel, Channel } from 'amqplib';
 import { AdvanceOrderStepUseCase } from "../domain/advance-order-step.usecase.js";
+import { propagation, context } from '@opentelemetry/api';
 
 
 @Injectable()
@@ -25,9 +26,15 @@ export class OrderStepConsumer implements OnModuleInit {
     private async handle(msg: any) {
         if (!msg) return;
         try {
-            const {orderId} = JSON.parse(msg.content.toString());
-            await this.advanceOrderStep.execute(orderId);
-            console.log(`Pedido ${orderId} avançado com sucesso`);
+            const {orderId, otelCarrier} = JSON.parse(msg.content.toString());
+
+            const parentContext = propagation.extract(context.active(), otelCarrier ?? {});
+
+            await context.with(parentContext, async () => {
+                await this.advanceOrderStep.execute(orderId);
+                console.log(`Pedido ${orderId} avançado com sucesso`);
+            });
+
             this.channel.ack(msg);
         } catch (error) {
             console.error('Erro ao processar mensagem: ', error);

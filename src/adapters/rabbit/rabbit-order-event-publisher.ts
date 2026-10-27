@@ -1,3 +1,4 @@
+import { propagation, context } from '@opentelemetry/api';
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { connect, ChannelModel, Channel } from 'amqplib';
 import { OrderEventPublisher } from "../../domain/order-event-publisher.js";
@@ -16,14 +17,23 @@ export class RabbitOrderEventPublisher implements OrderEventPublisher, OnModuleI
     }
 
     async publishCommandAccept(orderId: string): Promise<void> {
-        this.channel.sendToQueue('order.accept', Buffer.from(JSON.stringify({ orderId })));
+        const carrier: Record<string, string> = {};
+        propagation.inject(context.active(), carrier);
+
+        this.channel.sendToQueue('order.accept', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
     }
 
     async publishCommandPrepare(orderId: string): Promise<void> {
+        const carrier: Record<string, string> = {};
+        propagation.inject(context.active(), carrier);
+
         this.channel.sendToQueue('order.prepare', Buffer.from(JSON.stringify({ orderId })));
     }
 
     async publishCommandDeliver(orderId: string): Promise<void> {
+        const carrier: Record<string, string> = {};
+        propagation.inject(context.active(), carrier);
+        
         this.channel.sendToQueue('order.deliver', Buffer.from(JSON.stringify({ orderId })));
     }
 
