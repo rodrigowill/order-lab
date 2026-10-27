@@ -15,32 +15,75 @@ A regra de sequência fica em `src/domain`. Prisma e RabbitMQ ficam em `src/adap
 
 ## Requisitos
 
-- Node.js 22
-- npm
-- Docker, para Postgres e RabbitMQ
+- Docker, nas duas formas de subir o projeto
+- Node.js 22 e npm, só para rodar API, worker e a tela fora do Docker
+
+As portas `5432`, `5672`, `15672`, `3000` e `80` são as mesmas nos dois modos. Use um modo de cada vez.
 
 ## Subir o projeto
+
+### Tudo no Docker
+
+O `docker-compose.yaml` sobe Postgres, a migration, RabbitMQ, API, worker e a tela. O serviço `migrate` aplica as migrations (`prisma migrate deploy`) depois que o Postgres fica saudável. API e worker esperam essa etapa terminar.
+
+```bash
+docker compose up --build -d
+```
+
+| Serviço | Endereço | Credenciais |
+| --- | --- | --- |
+| Postgres | `localhost:5432`, banco `order` | `postgres` / `postgres` |
+| RabbitMQ | `localhost:5672` | `orderlab` / `orderlab` |
+| Painel do RabbitMQ | http://localhost:15672 | `orderlab` / `orderlab` |
+| API | http://localhost:3000 | — |
+| Tela | http://localhost | — |
+
+O build da tela recebe `VITE_API_URL=http://localhost:3000`. A API libera CORS para `http://localhost` (tela no nginx, porta 80) e para `http://localhost:5173` (Vite).
+
+Acompanhar os logs, parar e apagar o volume do banco:
+
+```bash
+docker compose logs -f
+docker compose down
+docker compose down -v
+```
+
+`--build` recompila as imagens quando o código muda. Sem o worker, o comando HTTP é aceito e a lista continua no estado anterior até a mensagem ser consumida.
+
+### Serviço a serviço
+
+Postgres e RabbitMQ ficam no Docker. API, worker e a tela rodam no Node, com reload.
+
+1. Instalar as dependências da API e criar o `.env`:
 
 ```bash
 npm install
 cp .env.example .env
-docker compose up -d
+```
+
+O `.env.example` traz placeholders. Para os containers abaixo, o `.env` precisa disto:
+
+```
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/order"
+RABBITMQ_URL="amqp://orderlab:orderlab@localhost:5672"
+```
+
+2. Subir só a infraestrutura. Se a stack inteira já estiver no ar, pare antes com `docker compose down`, senão as portas da API e da tela ficam ocupadas.
+
+```bash
+docker compose up -d postgres rabbitmq
+```
+
+3. Gerar o client e aplicar as migrations no banco local:
+
+```bash
 npx prisma generate --config prisma7.config.ts
 npx prisma migrate dev --config prisma7.config.ts
 ```
 
-O `docker-compose.yaml` sobe o Postgres em `localhost:5432` (`postgres` / `postgres`, banco `order`) e o RabbitMQ em `localhost:5672` (`guest` / `guest`). O painel do RabbitMQ fica em `http://localhost:15672`.
+`prisma generate` cria o client em `src/generated/prisma`. O CLI lê a URL do banco em `prisma7.config.ts`, por isso os comandos passam `--config`.
 
-O `.env.example` traz placeholders. Para esses containers, o `.env` precisa disto:
-
-```
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/order"
-RABBITMQ_URL="amqp://guest:guest@localhost:5672"
-```
-
-`prisma generate` cria o client em `src/generated/prisma`. O CLI lê a URL do banco em `prisma7.config.ts`, por isso os comandos acima passam `--config`.
-
-São três processos. Cada um no seu terminal:
+4. Três processos, cada um no seu terminal:
 
 ```bash
 npm run start:dev
@@ -48,7 +91,7 @@ npm run start:worker:dev
 cd web && npm install && npm run dev
 ```
 
-A API escuta em `http://localhost:3000` e libera CORS para `http://localhost:5173`, que é a porta do Vite. Sem o worker, o comando HTTP é aceito e a lista continua no estado anterior até a mensagem ser consumida.
+A API escuta em http://localhost:3000. A tela do Vite abre em http://localhost:5173 e chama a API em `http://localhost:3000` por padrão (`web/src/api.ts`).
 
 ## Scripts
 
@@ -99,4 +142,6 @@ Exemplos de chamada estão em `api.http`.
 
 ## Tela
 
-`web/` é um app Vite + React. O formulário chama `POST /orders`. A lista mostra nome, descrição, valor e o rótulo do status (Colocado, Recebido, Preparado, Entregue) e oferece o próximo comando enquanto o pedido não está entregue.
+`web/` é um app Vite + React. No Docker ela é servida pelo nginx em http://localhost. No modo serviço a serviço, `npm run dev` sobe o Vite em http://localhost:5173.
+
+O formulário chama `POST /orders`. A lista mostra nome, descrição, valor e o rótulo do status (Colocado, Recebido, Preparado, Entregue) e oferece o próximo comando enquanto o pedido não está entregue.
