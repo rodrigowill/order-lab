@@ -76,6 +76,6 @@ services:
       args: 
         VITE_API_URL: http://localhost:3000
     container_name: order_web
-    restart: alwais
+    restart: always
     ports:
       - "80:80"

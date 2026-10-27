@@ -26,7 +26,7 @@ export function OrderList({ orders, onAction }: Props) {
             await fn(id);
             setTimeout(onAction, 1500);
         } catch (err) {
-            alert(err.message);
+            alert(err instanceof Error ? err.message : String(err));
         }
     }
 
