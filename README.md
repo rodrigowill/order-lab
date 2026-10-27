@@ -18,7 +18,7 @@ A regra de sequência fica em `src/domain`. Prisma e RabbitMQ ficam em `src/adap
 - Docker, nas duas formas de subir o projeto
 - Node.js 22 e npm, só para rodar API, worker e a tela fora do Docker
 
-As portas `5432`, `5672`, `15672`, `3000` e `80` são as mesmas nos dois modos. Use um modo de cada vez.
+As portas `5432`, `5672`, `15672`, `3000`, `4317`, `4318`, `16686` e `80` são usadas pelos dois modos. Use um modo de cada vez para evitar conflitos.
 
 ## Subir o projeto
 
@@ -37,22 +37,36 @@ docker compose up --build -d
 | Painel do RabbitMQ | http://localhost:15672 | `orderlab` / `orderlab` |
 | API | http://localhost:3000 | — |
 | Tela | http://localhost | — |
+| Jaeger | http://localhost:16686 | — |
 
 O build da tela recebe `VITE_API_URL=http://localhost:3000`. A API libera CORS para `http://localhost` (tela no nginx, porta 80) e para `http://localhost:5173` (Vite).
 
-Acompanhar os logs, parar e apagar o volume do banco:
+API e worker enviam traces para `http://jaeger:4318/v1/traces` usando OTLP/HTTP. Esse é o endereço interno entre containers; a interface web do Jaeger fica em `http://localhost:16686`. A porta `4317` fica disponível para OTLP/gRPC.
+
+Para acompanhar um trace, crie um pedido e avance seus estados. Na interface do Jaeger, procure pelos serviços `order-lab-api` e `order-lab-worker` e ajuste o intervalo de tempo. O contexto é propagado junto às mensagens do RabbitMQ. O Jaeger all-in-one usa armazenamento em memória por padrão, então os traces desaparecem quando o container reinicia.
+
+O Compose usa `jaegertracing/all-in-one:latest`; a imagem em execução atualmente informa Jaeger v1.76 e exibe o aviso de fim de suporte da versão 1. Esse aviso não impede o serviço de iniciar, mas a imagem não deve ser tratada como uma instalação atualizada. Para usar Jaeger v2, será necessário trocar a imagem e revisar sua configuração.
+
+Para acompanhar logs e parar os serviços:
 
 ```bash
-docker compose logs -f
+docker compose logs -f api worker jaeger
 docker compose down
+```
+
+Para remover também os volumes, incluindo o banco de pedidos:
+
+```bash
 docker compose down -v
 ```
+
+`docker compose down -v` apaga os dados persistidos do PostgreSQL.
 
 `--build` recompila as imagens quando o código muda. Sem o worker, o comando HTTP é aceito e a lista continua no estado anterior até a mensagem ser consumida.
 
 ### Serviço a serviço
 
-Postgres e RabbitMQ ficam no Docker. API, worker e a tela rodam no Node, com reload.
+Postgres, RabbitMQ e Jaeger ficam no Docker. API, worker e a tela rodam no Node, com reload.
 
 1. Instalar as dependências da API e criar o `.env`:
 
@@ -71,7 +85,7 @@ RABBITMQ_URL="amqp://orderlab:orderlab@localhost:5672"
 2. Subir só a infraestrutura. Se a stack inteira já estiver no ar, pare antes com `docker compose down`, senão as portas da API e da tela ficam ocupadas.
 
 ```bash
-docker compose up -d postgres rabbitmq
+docker compose up -d postgres rabbitmq jaeger
 ```
 
 3. Gerar o client e aplicar as migrations no banco local:
@@ -86,12 +100,27 @@ npx prisma migrate dev --config prisma7.config.ts
 4. Três processos, cada um no seu terminal:
 
 ```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
+export OTEL_SERVICE_NAME=order-lab-api
 npm run start:dev
+```
+
+Em outro terminal:
+
+```bash
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318/v1/traces
+export OTEL_SERVICE_NAME=order-lab-worker
 npm run start:worker:dev
+```
+
+Em um terceiro terminal:
+
+```bash
 cd web && npm install && npm run dev
 ```
 
 A API escuta em http://localhost:3000. A tela do Vite abre em http://localhost:5173 e chama a API em `http://localhost:3000` por padrão (`web/src/api.ts`).
+As variáveis `OTEL_*` precisam estar definidas antes de iniciar cada processo Node, pois o SDK OpenTelemetry é inicializado no carregamento da aplicação.
 
 ## Scripts
 
