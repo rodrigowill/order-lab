@@ -1,5 +1,5 @@
 
-import { InvalidOrderStepError, NotFoundError } from "../errors.js";
+import { InvalidOrderStepError, NotFoundError } from "./errors.js";
 import { OrderStatus } from "./order-status.js";
 import { OrderRepository } from "./order.repository.js";
 

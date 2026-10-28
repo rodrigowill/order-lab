@@ -3,8 +3,8 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
-import { NotFoundErrorFilter } from './not-found-error/not-found-error.filter.js';
-import { InvalidOrderStepErrorFilter } from './not-found-error/invalid-order-step.filter.js';
+import { NotFoundErrorFilter } from './adapters/http/not-found-error.filter.js';
+import { InvalidOrderStepErrorFilter } from './adapters/http/invalid-order-step.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { PrismaModule } from "../prisma/prisma.module.js";
+import { PrismaModule } from "../adapters/prisma/prisma.module.js";
 import { PrismaOrderRepository } from "../adapters/prisma/prisma-order.repository.js";
 import { OrderRepository } from "../domain/order.repository.js";
 import { AdvanceOrderStepUseCase } from "../domain/advance-order-step.usecase.js";

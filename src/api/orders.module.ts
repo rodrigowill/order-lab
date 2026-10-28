@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller.js';
-import { PrismaModule } from '../prisma/prisma.module.js';
+import { PrismaModule } from '../adapters/prisma/prisma.module.js';
 import { PrismaOrderRepository } from '../adapters/prisma/prisma-order.repository.js';
 import { RabbitOrderEventPublisher } from '../adapters/rabbit/rabbit-order-event-publisher.js';
 import { OrderRepository } from '../domain/order.repository.js';

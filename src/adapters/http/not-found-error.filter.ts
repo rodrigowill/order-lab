@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
-import { NotFoundError } from '../errors.js';
+import { NotFoundError } from '../../domain/errors.js';
 
 @Catch(NotFoundError)
 export class NotFoundErrorFilter<T> implements ExceptionFilter {

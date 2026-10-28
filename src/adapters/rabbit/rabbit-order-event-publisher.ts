@@ -16,25 +16,23 @@ export class RabbitOrderEventPublisher implements OrderEventPublisher, OnModuleI
         await this.channel.assertQueue('order.deliver', { durable: true });
     }
 
-    async publishCommandAccept(orderId: string): Promise<void> {
+    private publish(queue: string, orderId: string) {
         const carrier: Record<string, string> = {};
         propagation.inject(context.active(), carrier);
+        this.channel.sendToQueue(queue, Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
+    }
 
-        this.channel.sendToQueue('order.accept', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
+    async publishCommandAccept(orderId: string): Promise<void> {
+        this.publish('order.accept', orderId);
     }
 
     async publishCommandPrepare(orderId: string): Promise<void> {
-        const carrier: Record<string, string> = {};
-        propagation.inject(context.active(), carrier);
-
-        this.channel.sendToQueue('order.prepare', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
+        this.publish('order.prepare', orderId);
     }
 
     async publishCommandDeliver(orderId: string): Promise<void> {
-        const carrier: Record<string, string> = {};
-        propagation.inject(context.active(), carrier);
-        
-        this.channel.sendToQueue('order.deliver', Buffer.from(JSON.stringify({ orderId, otelCarrier: carrier })));
+        this.publish('order.deliver', orderId);
+
     }
 
 }

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { OrderRepository } from "../../domain/order.repository.js";
-import { PrismaService } from "../../prisma/prisma.service.js";
+import { PrismaService } from "./prisma.service.js";
 import { Order } from "../../domain/order.entity.js";
 import { OrderStatus } from "../../domain/order-status.js";
 

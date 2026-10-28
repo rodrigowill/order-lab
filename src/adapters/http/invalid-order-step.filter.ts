@@ -1,5 +1,5 @@
 import { ArgumentsHost, Catch, ExceptionFilter } from "@nestjs/common";
-import { InvalidOrderStepError } from "../errors.js";
+import { InvalidOrderStepError } from "../../domain/errors.js";
 
 @Catch(InvalidOrderStepError)
 export class InvalidOrderStepErrorFilter implements ExceptionFilter {

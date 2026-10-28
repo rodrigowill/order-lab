@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { Order } from "./order.entity.js";
 import { OrderRepository } from "./order.repository.js";
-import { NotFoundError } from "../errors.js";
+import { NotFoundError } from "./errors.js";
 
 @Injectable()
 export class AdvanceOrderStepUseCase {
