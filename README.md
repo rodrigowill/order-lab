@@ -2,7 +2,7 @@
 
 Laboratório local de um pedido de balcão. A API em [NestJS](https://nestjs.com/) grava o pedido como colocado e publica os comandos de aceite, preparo e entrega. Um worker, também NestJS, consome o [RabbitMQ](https://www.rabbitmq.com/) e é quem persiste o estado seguinte no [PostgreSQL](https://www.postgresql.org/) via [Prisma](https://www.prisma.io/). A tela em React lista os pedidos e dispara esses comandos.
 
-A regra de sequência fica em `src/domain`. Prisma e RabbitMQ ficam em `src/adapters`. A API (`src/orders`) e o worker (`src/worker`) ligam essas peças na inicialização.
+A regra de sequência fica em `src/domain`. Prisma e RabbitMQ ficam em `src/adapters`. A API (`src/api`) e o worker (`src/worker`) ligam essas peças na inicialização.
 
 ## Documentação
 
